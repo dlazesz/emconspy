@@ -45,7 +45,8 @@ def import_pyjnius(class_path):
 class EmConsPy:
     class_path = os.path.join(os.path.dirname(__file__), 'BerkeleyProdParser.jar') + ':' + os.path.dirname(__file__)
 
-    def __init__(self, model_file='szk.const.model', source_fields=None, target_fields=None):
+    def __init__(self, model_file=os.path.normpath(os.path.join(os.path.dirname(__file__), 'szk.const.model')),
+                 source_fields=None, target_fields=None):
         self._autoclass = import_pyjnius(EmConsPy.class_path)
         self._jstr = self._autoclass('java.lang.String')
         self._jlist = self._autoclass('java.util.ArrayList')
