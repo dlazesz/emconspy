@@ -9,7 +9,8 @@ def import_pyjnius(class_path):
     PyJNIus can only be imported once per Python interpreter and one must set the classpath before importing...
     """
     # Check if autoclass is already imported...
-    if 'autoclass' not in locals() and 'autoclass' not in globals():
+    import jnius_config
+    if not jnius_config.vm_running:
 
         # Tested on Ubuntu 16.04 64bit with openjdk-8 JDK and JRE installed:
         # sudo apt install openjdk-8-jdk-headless openjdk-8-jre-headless
@@ -22,7 +23,6 @@ def import_pyjnius(class_path):
 
         os.environ['CLASSPATH'] = ':'.join((class_path, os.environ.get('CLASSPATH', ''))).rstrip(':')
 
-        import jnius_config
         jnius_config.add_options('-Xmx4096m')
 
         # Set path and import jnius for this session
