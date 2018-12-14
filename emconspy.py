@@ -3,13 +3,14 @@
 
 import os
 
+import jnius_config
 
-def import_pyjnius(class_path):
+
+def import_pyjnius():
     """
     PyJNIus can only be imported once per Python interpreter and one must set the classpath before importing...
     """
     # Check if autoclass is already imported...
-    import jnius_config
     if not jnius_config.vm_running:
 
         # Tested on Ubuntu 16.04 64bit with openjdk-8 JDK and JRE installed:
@@ -20,10 +21,6 @@ def import_pyjnius(class_path):
             os.environ['JAVA_HOME']
         except KeyError:
             os.environ['JAVA_HOME'] = '/usr/lib/jvm/java-8-openjdk-amd64/'
-
-        os.environ['CLASSPATH'] = ':'.join((class_path, os.environ.get('CLASSPATH', ''))).rstrip(':')
-
-        jnius_config.add_options('-Xmx4096m')
 
         # Set path and import jnius for this session
         from jnius import autoclass
@@ -36,7 +33,8 @@ def import_pyjnius(class_path):
         urls = ucl.getURLs()
         cp = ':'.join(url.getFile() for url in urls)
 
-        print('Warning: PyJNIus is already imported with the following classpath: {0}'.format(cp), file=sys.stderr)
+        print('Warning: PyJNIus is already imported with the following classpath: {0} Please check if it is ok!'.
+              format(cp), file=sys.stderr)
 
     # Return autoclass for later use...
     return autoclass
@@ -44,10 +42,14 @@ def import_pyjnius(class_path):
 
 class EmConsPy:
     class_path = os.path.join(os.path.dirname(__file__), 'BerkeleyProdParser.jar') + ':' + os.path.dirname(__file__)
+    vm_opts = '-Xmx4096m'
 
     def __init__(self, model_file=os.path.normpath(os.path.join(os.path.dirname(__file__), 'szk.const.model')),
                  source_fields=None, target_fields=None):
-        self._autoclass = import_pyjnius(EmConsPy.class_path)
+        if not jnius_config.vm_running:
+            jnius_config.add_classpath(EmConsPy.class_path)
+            jnius_config.add_options(EmConsPy.vm_opts)
+            self._autoclass = import_pyjnius()
         self._jstr = self._autoclass('java.lang.String')
         self._jlist = self._autoclass('java.util.ArrayList')
         self._parser = self._autoclass('hu.u_szeged.cons.PPReplaceParser')
