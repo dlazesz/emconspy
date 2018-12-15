@@ -26,7 +26,7 @@ def import_pyjnius():
         from jnius import autoclass
     else:
         import sys
-        from jnius import cast, autoclass  # Dummy autoclass import to silence the IDE
+        from jnius import cast, autoclass
         class_loader = autoclass('java.lang.ClassLoader')
         cl = class_loader.getSystemClassLoader()
         ucl = cast('java.net.URLClassLoader', cl)
@@ -49,7 +49,7 @@ class EmConsPy:
         if not jnius_config.vm_running:
             jnius_config.add_classpath(EmConsPy.class_path)
             jnius_config.add_options(EmConsPy.vm_opts)
-            self._autoclass = import_pyjnius()
+        self._autoclass = import_pyjnius()
         self._jstr = self._autoclass('java.lang.String')
         self._jlist = self._autoclass('java.util.ArrayList')
         self._parser = self._autoclass('hu.u_szeged.cons.PPReplaceParser')
