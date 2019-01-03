@@ -76,7 +76,7 @@ class EmConsPy:
 
     @staticmethod
     def prepare_fields(field_names):
-        return [field_names['string'], field_names['lemma'], field_names['hfstana']]
+        return [field_names['form'], field_names['lemma'], field_names['xpostag']]
 
     def parse_sentence(self, lines):
         sent = self._jlist()

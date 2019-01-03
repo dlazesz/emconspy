@@ -16,7 +16,7 @@ A wrapper implemented in Python for __emCons__ (Berkeley parser a.k.a. Product P
 
   - Install [git-lfs](https://git-lfs.github.com/)
   - `git-lfs install`
-  - Clone the repository: `git clone https://github.com/dlt-rilmta/emdeppy` (It should clone the model file also!)
+  - Clone the repository: `git clone https://github.com/dlt-rilmta/emconspy` (It should clone the model file also!)
   - ``sudo apt install `cat Aptfile` ``
   - `sudo pip3 install Cython`
   - `sudo pip3 install -r requirements.txt`
