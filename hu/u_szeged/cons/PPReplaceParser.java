@@ -29,6 +29,8 @@ public class PPReplaceParser extends ProductParser {
 	}
 
 	public static void initReplaceParser(String modelFileName, int modelNumber) {
+		System.setOut(new NullPrintStream());
+		System.setErr(new NullPrintStream());
 		// TODO: "szk.const.model", 4
 		ArrayParser.SILENT = true;
 		ProductParserData ppd = PPReplaceParser.loadModel(modelFileName);
