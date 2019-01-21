@@ -35,7 +35,7 @@ A wrapper implemented in Python for __emCons__ (Berkeley parser a.k.a. Product P
              'sétálni sétál [/V][Inf]\n' \
              '. . OTHER'
 	>>> sentence = ex.split('\n')  # Like reading a file with open()
-	>>> print(list(p.parse_sentence(sentence)))
+	>>> print(list(p.parse_sentence((t.split('\t') for t in sentence)))
 	...
 	>>> p.parse_stream(ex)  # Same as parse_sentence, but sentences are separated with empty lines (like CoNLL-* fomrat)
 	...

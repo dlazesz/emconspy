@@ -68,7 +68,7 @@ class EmConsPy:
         self.target_fields = target_fields
 
     def process_sentence(self, sen, field_names):
-        parsed_sentence = self.parse_sentence('\t'.join((tok[field_names[0]], tok[field_names[1]], tok[field_names[2]]))
+        parsed_sentence = self.parse_sentence((tok[field_names[0]], tok[field_names[1]], tok[field_names[2]])
                                               for tok in sen)
         for tok, out_label in zip(sen, parsed_sentence):
             tok.append(out_label)
@@ -82,12 +82,11 @@ class EmConsPy:
         sent = self._jlist()
 
         # Read the text from TSV style input
-        for line in lines:
-            curr_form, curr_lemma, curr_hfstana = line.strip().split()
+        for curr_form, curr_lemma, curr_xpostag in lines:
             tok = self._jlist()
             tok.add(self._jstr(curr_form.encode('UTF-8')))
             tok.add(self._jstr(curr_lemma.encode('UTF-8')))
-            tok.add(self._jstr(curr_hfstana.encode('UTF-8')))
+            tok.add(self._jstr(curr_xpostag.encode('UTF-8')))
             sent.add(tok)
 
         # Parse
@@ -99,14 +98,14 @@ class EmConsPy:
     def parse_stream(self, stream):
         lines = []
         for line in stream:
-            line = line.strip()
-            if len(line) == 0:
+            fields = line.strip().split('\t')
+            if len(fields) == 0:
                 for curr_line, label in zip(lines, self.parse_sentence(lines)):
                     yield '{0}\t{1}\n'.format(curr_line, label).encode('UTF-8')
                 yield b'\n'
                 lines = []
             else:
-                lines.append(line)
+                lines.append(fields)
         if len(lines) > 0:
             for curr_line, label in zip(lines, self.parse_sentence(lines)):
                 yield '{0}\t{1}\n'.format(curr_line, label).encode('UTF-8')
