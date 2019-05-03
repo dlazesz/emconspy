@@ -46,6 +46,7 @@ def import_pyjnius():
 class EmConsPy:
     class_path = os.path.join(os.path.dirname(__file__), 'BerkeleyProdParser.jar') + ':' + os.path.dirname(__file__)
     vm_opts = '-Xmx4096m'
+    pass_header = True
 
     def __init__(self, model_file=os.path.normpath(os.path.join(os.path.dirname(__file__), 'szk.const.model')),
                  source_fields=None, target_fields=None):
