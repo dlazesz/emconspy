@@ -45,14 +45,11 @@ def import_pyjnius():
 
 class EmConsPy:
     class_path = os.path.join(os.path.dirname(__file__), 'BerkeleyProdParser.jar') + ':' + os.path.dirname(__file__)
-    vm_opts = '-Xmx4096m'
+    vm_opts = '-Xmx6144m'
     pass_header = True
 
     def __init__(self, model_file=os.path.normpath(os.path.join(os.path.dirname(__file__), 'szk.const.model')),
                  source_fields=None, target_fields=None):
-        if not jnius_config.vm_running:
-            jnius_config.add_classpath(EmConsPy.class_path)
-            jnius_config.add_options(EmConsPy.vm_opts)
         self._autoclass = import_pyjnius()
         self._jstr = self._autoclass('java.lang.String')
         self._jlist = self._autoclass('java.util.ArrayList')
@@ -110,6 +107,11 @@ class EmConsPy:
         if len(lines) > 0:
             for curr_line, label in zip(lines, self.parse_sentence(lines)):
                 yield '{0}\t{1}\n'.format(curr_line, label).encode('UTF-8')
+
+
+if not jnius_config.vm_running:
+    jnius_config.add_classpath(EmConsPy.class_path)
+    jnius_config.add_options(EmConsPy.vm_opts)
 
 
 if __name__ == '__main__':
