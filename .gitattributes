@@ -1,1 +1,2 @@
 szk.const.model filter=lfs diff=lfs merge=lfs -text
+szk.const.pos_only.model filter=lfs diff=lfs merge=lfs -text

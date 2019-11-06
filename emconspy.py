@@ -48,7 +48,7 @@ class EmConsPy:
     vm_opts = '-Xmx6144m'
     pass_header = True
 
-    def __init__(self, model_file=os.path.normpath(os.path.join(os.path.dirname(__file__), 'szk.const.model')),
+    def __init__(self, model_file=os.path.normpath(os.path.join(os.path.dirname(__file__), 'szk.const.pos_only.model')),
                  source_fields=None, target_fields=None):
         self._autoclass = import_pyjnius()
         self._jstr = self._autoclass('java.lang.String')
@@ -123,5 +123,6 @@ if __name__ == '__main__':
          'sétálni sétál [/V][Inf]\n' \
          '. . OTHER'
 
-    for inp_line, output_label in zip(ex.split('\n'), dep_parser.parse_sentence(ex.split('\n'))):
+    for inp_line, output_label in zip(ex.split('\n'),
+                                      dep_parser.parse_sentence(line.split(' ') for line in ex.split('\n'))):
         print(inp_line, output_label, sep='\t')
