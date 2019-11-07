@@ -43,9 +43,25 @@ def import_pyjnius():
     return autoclass
 
 
+def get_java_mem():
+    """return size of memory in MB for "java -Xmx"
+    """
+    currmem = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES') // (1024 ** 2)
+    minmem = 6*1024
+    maxmem = 4*minmem
+    mem = 0
+    if currmem > maxmem + 4*1024:
+        mem = maxmem
+    elif currmem > minmem + 4*1024:
+        mem = currmem - 4*1024
+    else:
+        mem = minmem
+    return mem
+
+
 class EmConsPy:
     class_path = os.path.join(os.path.dirname(__file__), 'BerkeleyProdParser.jar') + ':' + os.path.dirname(__file__)
-    vm_opts = '-Xmx6144m'
+    vm_opts = '-Xmx{0}m'.format(get_java_mem())
     pass_header = True
 
     def __init__(self, model_file=os.path.normpath(os.path.join(os.path.dirname(__file__), 'szk.const.pos_only.model')),
