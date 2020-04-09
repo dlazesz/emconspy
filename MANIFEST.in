@@ -1,4 +1,3 @@
 include emconspy/szk.const.pos_only.model
-include emconspy/hu/u_szeged/cons/PPReplaceModel.class
-include emconspy/hu/u_szeged/cons/PPReplaceParser.class
-include emdeppy/BerkeleyProdParser.jar
+include emconspy/BerkeleyProdParser.jar
+include emconspy/PPReplaceParser.jar

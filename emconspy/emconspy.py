@@ -22,7 +22,8 @@ def get_java_mem():
 
 
 class EmConsPy:
-    class_path = os.path.join(os.path.dirname(__file__), 'BerkeleyProdParser.jar') + ':' + os.path.dirname(__file__)
+    class_path = ':'.join(os.path.join(os.path.dirname(__file__), jar)
+                          for jar in ('BerkeleyProdParser.jar', 'PPReplaceParser.jar'))
     vm_opts = '-Xmx{0}m'.format(get_java_mem())
     pass_header = True
 
