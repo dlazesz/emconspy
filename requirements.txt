@@ -1,3 +1,4 @@
 Cython
 # Must be installed after Cython IN A SEPARATE STEP!
 pyjnius==1.2
+xtsv>=1.0,<2.0

@@ -1,46 +1,9 @@
-#!/usr/bin/python3
+#!/usr/bin/env pyhton3
 # -*- coding: utf-8, vim: expandtab:ts=4 -*-
 
 import os
 
-import jnius_config
-
-
-def import_pyjnius():
-    """
-    PyJNIus can only be imported once per Python interpreter and one must set the classpath before importing...
-    """
-    # Check if autoclass is already imported...
-    if not jnius_config.vm_running:
-
-        # Tested on Ubuntu 16.04 64bit with openjdk-8 JDK and JRE installed:
-        # sudo apt install openjdk-8-jdk-headless openjdk-8-jre-headless
-
-        # Set JAVA_HOME for this session
-        try:
-            os.environ['JAVA_HOME']
-        except KeyError:
-            os.environ['JAVA_HOME'] = '/usr/lib/jvm/java-8-openjdk-amd64/'
-
-        # Set path and import jnius for this session
-        from jnius import autoclass
-    elif hasattr(jnius_config, 'classpath_show_warning') and not jnius_config.classpath_show_warning:
-        from jnius import autoclass  # Warning already had shown. It is enough to show it only once!
-    else:
-        import sys
-        from jnius import cast, autoclass
-        class_loader = autoclass('java.lang.ClassLoader')
-        cl = class_loader.getSystemClassLoader()
-        ucl = cast('java.net.URLClassLoader', cl)
-        urls = ucl.getURLs()
-        cp = ':'.join(url.getFile() for url in urls)
-
-        jnius_config.classpath_show_warning = False
-        print('Warning: PyJNIus is already imported with the following classpath: {0} Please check if it is ok!'.
-              format(cp), file=sys.stderr)
-
-    # Return autoclass for later use...
-    return autoclass
+from xtsv import jnius_config, import_pyjnius
 
 
 def get_java_mem():
@@ -49,7 +12,6 @@ def get_java_mem():
     currmem = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES') // (1024 ** 2)
     minmem = 6*1024
     maxmem = 4*minmem
-    mem = 0
     if currmem > maxmem + 4*1024:
         mem = maxmem
     elif currmem > minmem + 4*1024:
@@ -128,17 +90,3 @@ class EmConsPy:
 if not jnius_config.vm_running:
     jnius_config.add_classpath(EmConsPy.class_path)
     jnius_config.add_options(EmConsPy.vm_opts)
-
-
-if __name__ == '__main__':
-    dep_parser = EmConsPy()
-
-    ex = 'A a [/Det|Art.Def]\n' \
-         'kutya kutya [/N][Nom]\n' \
-         'elment elmegy [/V][Prs.NDef.3Sg]\n' \
-         'sétálni sétál [/V][Inf]\n' \
-         '. . OTHER'
-
-    for inp_line, output_label in zip(ex.split('\n'),
-                                      dep_parser.parse_sentence(line.split(' ') for line in ex.split('\n'))):
-        print(inp_line, output_label, sep='\t')

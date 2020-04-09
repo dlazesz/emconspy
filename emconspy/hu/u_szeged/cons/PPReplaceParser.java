@@ -1,5 +1,7 @@
 package hu.u_szeged.cons;
 
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.FileInputStream;
 import java.io.BufferedInputStream;
 import java.io.ObjectInputStream;
@@ -29,8 +31,13 @@ public class PPReplaceParser extends ProductParser {
 	}
 
 	public static void initReplaceParser(String modelFileName, int modelNumber) {
-		System.setOut(new NullPrintStream());
-		System.setErr(new NullPrintStream());
+
+        // Silence JAVA STDOUT and STDERR temporarily
+        PrintStream orig_out = System.out;
+        PrintStream orig_err = System.err;
+		System.setOut(new PrintStream(OutputStream.nullOutputStream()));
+		System.setErr(new PrintStream(OutputStream.nullOutputStream()));
+
 		// TODO: "szk.const.model", 4
 		ArrayParser.SILENT = true;
 		ProductParserData ppd = PPReplaceParser.loadModel(modelFileName);
@@ -47,6 +54,9 @@ public class PPReplaceParser extends ProductParser {
 		wordFreqs = ppdr.wordFreqs;
 		threshold = ppdr.threshold;
 		// System.out.println("Initializing the product parser...");
+		// Restore JAVA STDOUT and STDERR
+		System.setOut(orig_out);
+		System.setErr(orig_err);
 
 	}
 
@@ -107,10 +117,10 @@ public class PPReplaceParser extends ProductParser {
 			/* XXX feat-ban a "." helyett "|" kell? -- ez nem befolyásolta */
 			//__feat = __feat.replace(".", "|");
 
-			System.out.println( "annot = " + annot );
-			System.out.println( "POS   = " + __pos );
-			System.out.println( "feat  = " + __feat );
-			System.out.println();
+			// System.out.println( "annot = " + annot );
+			// System.out.println( "POS   = " + __pos );
+			// System.out.println( "feat  = " + __feat );
+			// System.out.println();
 
 			tokfeats[i][2] = __pos;
 			tokfeats[i][3] = __feat;

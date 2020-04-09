@@ -109,3 +109,5 @@ venv.bak/
 # Temp file from editor
 *~
 
+# JAVA classes
+# *.class  # TODO when the JAVA part is separated...

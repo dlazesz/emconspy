@@ -2,6 +2,8 @@
 # emConsPy
 A wrapper implemented in Python for __emCons__ (Berkeley parser a.k.a. Product Parser).
 
+__WARNING__: This wrapper is only compatible with [JAVA 11](https://askubuntu.com/questions/1037646/why-is-openjdk-10-packaged-as-openjdk-11/1037655#1037655) or higher!
+
 ## Requirements
 
   - _(Included in this repository)_ [Berkeley Parser](http://nlp.cs.berkeley.edu/software.shtml) compiled (stripped from [Magyarlánc 3.0](https://github.com/antaljanosbenjamin/magyarlanc/))

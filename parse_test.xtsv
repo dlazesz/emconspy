@@ -1,0 +1,7 @@
+form	lemma	xpostag
+A	a	[/Det|Art.Def]
+kutya	kutya	[/N][Nom]
+elment	elmegy	[/V][Prs.NDef.3Sg]
+sétálni	sétál	[/V][Inf]
+.	.	OTHER
+
