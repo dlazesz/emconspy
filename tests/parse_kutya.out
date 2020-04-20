@@ -1,0 +1,7 @@
+form	lemma	xpostag	cons
+A	a	[/Det|Art.Def]	(ROOT(CP(NP*
+kutya	kutya	[/N][Nom]	*)
+elment	elmegy	[/V][Prs.NDef.3Sg]	(V_(V0*))
+sétálni	sétál	[/V][Inf]	(INF_(INF0*))
+.	.	OTHER	*))
+
