@@ -12,7 +12,6 @@ __WARNING__: This wrapper is only compatible with [JAVA 11](https://askubuntu.co
   - Java JRE as in Aptfile (for building dependencies)
   - Python 3 (tested with 3.6)
   - Pip to install the additional requirements in requirements.txt
-(MUST BE DONE IN TWO STEPS! -- as written in 'Install on local machine')
 
 ## Install on local machine
 
@@ -20,8 +19,8 @@ __WARNING__: This wrapper is only compatible with [JAVA 11](https://askubuntu.co
   - `git-lfs install`
   - Clone the repository: `git clone https://github.com/dlt-rilmta/emconspy` (It should clone the model file also!)
   - ``sudo apt install `cat Aptfile` ``
-  - `sudo pip3 install Cython`
-  - `sudo pip3 install -r requirements.txt`
+  - `make build`
+  - `sudo pip3 install dist/*.whl`
   - Use from Python
 
 ## Usage
