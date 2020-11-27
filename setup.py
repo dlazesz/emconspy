@@ -20,7 +20,7 @@ with open('README.md') as fh:
 
 setuptools.setup(
     name='emconspy',
-    # Get version without actually importing the module
+    # Get version without actually importing the module (else we need the dependencies installed)
     version=getattr(import_pyhton_file('version', 'emconspy/version.py'), '__version__'),
     author='dlazesz',  # Will warn about missing e-mail
     description='A wrapper implemented in Python for emCons (Berkeley parser a.k.a. Product Parser)',

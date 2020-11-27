@@ -1,5 +1,5 @@
-# Bash is needed for time
 .DEFAULT_GOAL = all
+# Bash is needed for time, compgen, [[ and other builtin commands
 SHELL := /bin/bash -o pipefail
 RED := $(shell tput setaf 1)
 GREEN := $(shell tput setaf 2)
@@ -13,26 +13,29 @@ VENVPYTHON := $(VENVDIR)/bin/python
 MODULE := emconspy
 MODULE_PARAMS :=
 
-# This target does not show as possible target with bash completion
---extra-deps:
+# These targets do not show as possible target with bash completion
+__extra-deps:
  	# Do extra stuff (e.g. compiling, downloading) before building the package
 	@echo "Compiling JAVA wrapper..."  # TODO Put build in setup.py?
-	@for dep_command in javac jar; do \
-		command -v $(dep_command) >/dev/null 2>&1 || \
-			(echo >&2 "$(RED)Command \`$(dep_command)\`could not be found!$(NOCOLOR)"; exit 1); \
+	for dep_command in javac jar; do \
+		command -v $${dep_command} >/dev/null 2>&1 || \
+			(echo >&2 "$(RED)Command \`$${dep_command}\`could not be found!$(NOCOLOR)"; exit 1); \
 	done && (\
-	[[ -f $(CURDIR)/emconspy/PPReplaceParser.jar ]] || \
-	(javac -sourcepath ./emconspy/ -cp ./emconspy/BerkeleyProdParser.jar:. ./emconspy/hu/u_szeged/cons/*.java && \
-		jar -cvfe emconspy/PPReplaceParser.jar hu.u_szeged.cons.PPReplaceParser \
-        	-C ./emconspy hu/u_szeged/cons/PPReplaceModel.class -C ./emconspy hu/u_szeged/cons/PPReplaceParser.class && \
-		rm -rf emconspy/hu/u_szeged/cons/*.class))
+	[[ -f "$(CURDIR)/emconspy/PPReplaceParser.jar" ]] || \
+	(javac -sourcepath $(CURDIR)/emconspy/ -cp $(CURDIR)/emconspy/BerkeleyProdParser.jar:. \
+		$(CURDIR)/emconspy/hu/u_szeged/cons/*.java && \
+		jar -cvfe $(CURDIR)/emconspy/PPReplaceParser.jar hu.u_szeged.cons.PPReplaceParser \
+        	-C $(CURDIR)/emconspy hu/u_szeged/cons/PPReplaceModel.class \
+        	-C $(CURDIR)/emconspy hu/u_szeged/cons/PPReplaceParser.class && \
+		rm -rf $(CURDIR)/emconspy/hu/u_szeged/cons/*.class))
 	@echo "$(GREEN)JAVA wrapper is succesfully compiled!$(NOCOLOR)"
-.PHONY: --extra-deps
+.PHONY: __extra-deps
 
---clean-extra-deps:
-	@rm -rf include emconspy/hu/u_szeged/cons/PPReplaceModel.class emconspy/hu/u_szeged/cons/PPReplaceParser.class \
-        emconspy/PPReplaceParser.jar
-.PHONY: --clean-extra-deps
+__clean-extra-deps:
+	@rm -rf $(CURDIR)/emconspy/hu/u_szeged/cons/PPReplaceModel.class \
+		$(CURDIR)/emconspy/hu/u_szeged/cons/PPReplaceParser.class \
+        $(CURDIR)/emconspy/PPReplaceParser.jar
+.PHONY: __clean-extra-deps
 
 # From here only generic parts
 
@@ -56,25 +59,27 @@ install-dep-packages:
 	@echo "Installing needed packages from Aptfile..."
 	@command -v apt-get >/dev/null 2>&1 || \
 			(echo >&2 "$(RED)Command 'apt-get' could not be found!$(NOCOLOR)"; exit 1)
-	@[[ $$(dpkg -l | grep -wcf $(CURDIR)/Aptfile) -eq $$(cat $(CURDIR)/Aptfile | wc -l) ]] || \
+	# Aptfile can be omited if empty
+	@[[ ! -f "$(CURDIR)/Aptfile" ]] || \
+	    ([[ $$(dpkg -l | grep -wcf $(CURDIR)/Aptfile) -eq $$(cat $(CURDIR)/Aptfile | wc -l) ]] || \
 		(sudo -E apt-get update && \
 		sudo -E apt-get -yq --no-install-suggests --no-install-recommends $(travis_apt_get_options) install \
-			`cat $(CURDIR)/Aptfile`)
+			`cat $(CURDIR)/Aptfile`))
 	@echo "$(GREEN)Needed packages are succesfully installed!$(NOCOLOR)"
 .PHONY: install-dep-packages
 
 venv:
-	@echo "Creating virtualenv...$(NOCOLOR)"
-	rm -rf $(VENVDIR)
-	$(PYTHON) -m venv $(VENVDIR)
-	$(VENVPIP) install wheel
-	$(VENVPIP) install -r requirements-dev.txt
+	@echo "Creating virtualenv in $(VENVDIR)...$(NOCOLOR)"
+	@rm -rf $(VENVDIR)
+	@$(PYTHON) -m venv $(VENVDIR)
+	@$(VENVPIP) install wheel
+	@$(VENVPIP) install -r requirements-dev.txt
 	@echo "$(GREEN)Virtualenv is succesfully created!$(NOCOLOR)"
 .PHONY: venv
 
-build: install-dep-packages venv --extra-deps
+build: install-dep-packages venv __extra-deps
 	@echo "Building package..."
-	@[[ -z "$$(ls dist/*.whl dist/*.tar.gz 2> /dev/null)" ]] || \
+	@[[ -z $$(compgen -G "dist/*.whl") && -z $$(compgen -G "dist/*.tar.gz") ]] || \
 		(echo -e "$(RED)dist/*.whl dist/*.tar.gz files exists.\nPlease use 'make clean' before build!$(NOCOLOR)"; \
 		exit 1)
 	@$(VENVPYTHON) setup.py sdist bdist_wheel
@@ -90,10 +95,10 @@ install: build
 test:
 	@echo "Running tests..."
 	@[[ $$(compgen -G "$(CURDIR)/tests/inputs/*.in") ]] || (echo "$(RED)No input testfiles found!$(NOCOLOR)"; exit 1)
-	for TEST_INPUT in $(CURDIR)/tests/inputs/*.in; do \
-		TEST_OUTPUT=$(CURDIR)/tests/outputs/$$(basename $${TEST_INPUT%in}out) ; \
-		time (cd /tmp && $(VENVPYTHON) -m $(MODULE) $(MODULE_PARAMS) -i $${TEST_INPUT} | \
-		diff -sy --suppress-common-lines - $${TEST_OUTPUT} 2>&1 | head -n100); \
+	for test_input in $(CURDIR)/tests/inputs/*.in; do \
+		test_output=$(CURDIR)/tests/outputs/$$(basename $${test_input%in}out) ; \
+		time (cd /tmp && $(VENVPYTHON) -m $(MODULE) $(MODULE_PARAMS) -i $${test_input} | \
+		diff -sy --suppress-common-lines - $${test_output} 2>&1 | head -n100); \
 	done
 	@echo "$(GREEN)The test was completed successfully!$(NOCOLOR)"
 	@echo "Comparing GIT TAG (\"$(TRAVIS_TAG)\") with pacakge version (\"v$(OLDVER)\")..."
@@ -104,11 +109,11 @@ test:
 
 uninstall:
 	@echo "Uninstalling..."
-	@[[ ! -d $(VENVDIR) || -z $$($(VENVPIP) list | grep -w $(MODULE)) ]] || $(VENVPIP) uninstall -y $(MODULE)
+	@[[ ! -d "$(VENVDIR)" || -z $$($(VENVPIP) list | grep -w $(MODULE)) ]] || $(VENVPIP) uninstall -y $(MODULE)
 	@echo "$(GREEN)The package was uninstalled successfully!$(NOCOLOR)"
 .PHONY: uninstall
 
-clean: --clean-extra-deps
+clean: __clean-extra-deps
 	@rm -rf $(VENVDIR) dist/ build/ $(MODULE).egg-info/
 .PHONY: clean
 
